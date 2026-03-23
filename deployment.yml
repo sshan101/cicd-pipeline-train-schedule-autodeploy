@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-schedule-deployment
+  labels:
+    app: train-schedule
+  annotations:
+    kubectl.kubernetes.io/restartedAt: "TIMESTAMP_PLACEHOLDER"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: train-schedule
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: train-schedule
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "TIMESTAMP_PLACEHOLDER"
+    spec:
+      containers:
+      - name: train-schedule
+        image: sshan101/train-schedule:latest
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 200m
